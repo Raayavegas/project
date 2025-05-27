@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hotel Application Form</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-database-compat.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 2rem;
+    }
+
+    .form-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin: 1rem 0 0.3rem;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      background: #28a745;
+      color: white;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #218838;
+    }
+
+    .success {
+      color: green;
+      margin-top: 1rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="form-container">
+      <h2>Hotel Booking Form</h2>
+      <form @submit.prevent="submitForm">
+        <label for="name">Name</label>
+        <input type="text" id="name" v-model="form.name" required />
+
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" v-model="form.phone" required pattern="[0-9]{10}" />
+
+        <label for="stay">Stay Duration (days)</label>
+        <input type="number" id="stay" v-model="form.stay" required min="1"/>
+
+        <label for="floor">Floor</label>
+        <select id="floor" v-model="form.floor" required>
+          <option disabled value="">Select Floor</option>
+          <option>1st</option>
+          <option>2nd</option>
+          <option>3rd</option>
+        </select>
+
+        <label for="ac">AC or Non-AC</label>
+        <select id="ac" v-model="form.ac" required>
+          <option disabled value="">Select Option</option>
+          <option>AC</option>
+          <option>Non-AC</option>
+        </select>
+
+        <label for="roomno">Room Number</label>
+        <input type="text" id="roomno" v-model="form.roomno" required />
+
+        <button type="submit">Submit</button>
+
+        <div class="success" v-if="successMessage">{{ successMessage }}</div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Config (replace with your actual config)
+    const firebaseConfig = {
+    apiKey: "AIzaSyBXeiTEGz5qGZiweydU1T1bFqOszp09wDI",
+    authDomain: "webdevelopment-b62d4.firebaseapp.com",
+    databaseURL: "https://webdevelopment-b62d4-default-rtdb.firebaseio.com",
+    projectId: "webdevelopment-b62d4",
+    storageBucket: "webdevelopment-b62d4.firebasestorage.app",
+    messagingSenderId: "756778297719",
+    appId: "1:756778297719:web:f6d35a2da4e4a0e33f1972",
+    measurementId: "G-5Q1WVG275P"
+  };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          form: {
+            name: '',
+            phone: '',
+            stay: '',
+            floor: '',
+            ac: '',
+            roomno: ''
+          },
+          successMessage: ''
+        };
+      },
+      methods: {
+        submitForm() {
+          const newBookingRef = database.ref('hotelBookings').push();
+          newBookingRef.set(this.form)
+            .then(() => {
+              this.successMessage = "Booking submitted successfully!";
+              this.form = { name: '', phone: '', stay: '', floor: '', ac: '', roomno: '' };
+            })
+            .catch(error => {
+              console.error("Error saving data:", error);
+            });
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
